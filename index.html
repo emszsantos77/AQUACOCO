@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decisões que Geram Valor - JBS Frios & AquaCoco</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        aquaGreen: '#008C45', 
+                        aquaLight: '#8DC63F', 
+                        sumoOrange: '#F15A24',
+                        darkBg: '#091510', 
+                        darkCard: '#112218' 
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #091510; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #112218; border-radius: 4px; border: 1px solid #8DC63F; }
+    </style>
+</head>
+<body class="bg-darkBg text-slate-100 antialiased min-h-screen font-sans flex flex-col">
+
+    <!-- HEADER INSTITUCIONAL -->
+    <header class="bg-aquaGreen p-4 shadow-lg flex justify-between items-center border-b-4 border-sumoOrange">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-white/10 p-1.5 rounded-lg border border-white/20">
+                <img src="logo-jbs.png" alt="JBS Frios" class="h-10 object-contain bg-white p-1 rounded" onerror="this.style.display='none'">
+                <img src="logo-aquacoco.png" alt="AquaCoco" class="h-10 object-contain bg-white p-1 rounded" onerror="this.style.display='none'">
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-wide">Decisões que Geram Valor</h1>
+                <p class="text-xs text-white/80">Dashboard Gerencial & Gestão de Campanhas</p>
+            </div>
+        </div>
+        <div class="bg-white/20 text-white px-3 py-1.5 rounded-full text-xs font-semibold animate-pulse flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-sumoOrange"></span> Atualização em Tempo Real
+        </div>
+    </header>
+
+    <!-- NAVEGAÇÃO DE ABAS -->
+    <div class="flex justify-center mt-6 space-x-4 px-4">
+        <button id="btn-tab-geral" onclick="switchTab('geral')" class="px-6 py-2.5 rounded-full text-sm font-bold bg-aquaGreen text-white transition-all shadow-[0_0_15px_rgba(0,140,69,0.4)] border border-aquaLight">
+            <i class="fa-solid fa-chart-pie mr-2"></i> Visão Geral Anual
+        </button>
+        <button id="btn-tab-campanha" onclick="switchTab('campanha')" class="px-6 py-2.5 rounded-full text-sm font-bold bg-darkCard text-slate-400 border border-slate-700 hover:text-white transition-all">
+            <i class="fa-solid fa-fire mr-2 text-sumoOrange"></i> Campanha Agosto
+        </button>
+    </div>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <main class="p-6 max-w-[1600px] w-full mx-auto flex-1">
+        
+        <!-- ================= ABA 1: VISÃO GERAL ANUAL ================= -->
+        <div id="tab-geral" class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <!-- FILTROS LATERAIS -->
+            <section class="lg:col-span-1 bg-darkCard p-4 rounded-xl border border-slate-800 flex flex-col justify-between shadow-lg">
+                <div>
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-sumoOrange font-bold text-sm tracking-wider uppercase">Filtros Estratégicos</h2>
+                        <button onclick="clearFilters()" class="text-xs text-slate-400 hover:text-aquaLight transition">Limpar Tudo</button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Marca</label>
+                            <select id="filter-marca" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-aquaLight outline-none"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Ano</label>
+                            <select id="filter-ano" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-aquaLight outline-none"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Mês</label>
+                            <select id="filter-mes" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-aquaLight outline-none"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Supervisor</label>
+                            <select id="filter-supervisor" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-aquaLight outline-none"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Vendedor</label>
+                            <select id="filter-vendedor" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-aquaLight outline-none"></select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DASHBOARD CONTENT -->
+            <section class="lg:col-span-4 space-y-6">
+                <!-- CARDS KPIs NO TOPO -->
+                <div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
+                    <div class="bg-darkCard p-4 rounded-xl border-l-4 border-cyan-500 shadow">
+                        <p class="text-xs text-slate-400 font-medium uppercase">Média Hectolitros (HL)</p>
+                        <p id="kpi-hectolitro" class="text-2xl font-bold mt-1 text-cyan-400">0,00 HL</p>
+                        <span id="mom-hectolitro" class="text-xs font-semibold block mt-1 text-slate-400">MoM: --</span>
+                    </div>
+                    <div class="bg-darkCard p-4 rounded-xl border-l-4 border-aquaLight shadow">
+                        <p class="text-xs text-slate-400 font-medium uppercase">Média Fat. Líquido</p>
+                        <p id="kpi-faturamento" class="text-2xl font-bold mt-1 text-white">R$ 0,00</p>
+                        <span id="mom-faturamento" class="text-xs font-semibold block mt-1 text-slate-400">MoM: --</span>
+                    </div>
+                    <div class="bg-darkCard p-4 rounded-xl border-l-4 border-sumoOrange shadow">
+                        <p class="text-xs text-slate-400 font-medium uppercase">Média Posit. Líquida</p>
+                        <p id="kpi-positivacao" class="text-2xl font-bold mt-1 text-white">0 Clientes</p>
+                        <span id="mom-positivacao" class="text-xs font-semibold block mt-1 text-slate-400">MoM: --</span>
+                    </div>
+                    <div class="bg-darkCard p-4 rounded-xl border-l-4 border-emerald-500 shadow">
+                        <p class="text-xs text-slate-400 font-medium uppercase">MoM % Crescimento Geral</p>
+                        <p id="kpi-mom-geral" class="text-2xl font-bold mt-1 text-emerald-400">0,00%</p>
+                        <span class="text-[10px] text-slate-400 block mt-1">(Média: Posit + Fat + HL)</span>
+                    </div>
+                    <div class="bg-darkCard p-4 rounded-xl border-l-4 border-amber-500 shadow">
+                        <p class="text-xs text-slate-400 font-medium uppercase">Ticket Médio / Clt</p>
+                        <p id="kpi-ticket" class="text-2xl font-bold mt-1 text-amber-500">R$ 0,00</p>
+                        <span id="mom-ticket" class="text-xs font-semibold block mt-1 text-slate-400">MoM: --</span>
+                    </div>
+                </div>
+
+                <!-- GRÁFICO INTEGRADO -->
+                <div class="bg-darkCard p-5 rounded-xl border border-slate-800 shadow">
+                    <h3 class="text-sm font-bold text-sumoOrange mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-line"></i> Evolução Histórica (Média Fat. Líquido, Positivação & HL)</h3>
+                    <div class="h-64 relative">
+                        <canvas id="chart-evolucao"></canvas>
+                    </div>
+                </div>
+
+                <!-- TABELAS PRODUTOS E TOP CIDADES -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <!-- TOP 20 PRODUTOS -->
+                    <div class="bg-darkCard p-4 rounded-xl border border-slate-800 shadow">
+                        <h3 class="text-sm font-bold text-sumoOrange mb-3 flex items-center gap-2"><i class="fa-solid fa-box-open"></i> Ranking de vendas por Produtos</h3>
+                        <div class="max-h-[320px] overflow-y-auto custom-scroll pr-1">
+                            <table class="w-full text-left text-xs text-slate-300">
+                                <thead class="sticky top-0 bg-darkCard z-10 shadow">
+                                    <tr class="border-b border-slate-700 text-slate-400">
+                                        <th class="py-2">FOTO</th>
+                                        <th class="py-2">PRODUTO</th>
+                                        <th class="py-2 text-right">MÉD. POSIT</th>
+                                        <th class="py-2 text-right">MÉD. FAT</th>
+                                        <th class="py-2 text-right">MÉD. HL</th>
+                                        <th class="py-2 text-right">MoM % GERAL</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-produtos"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- TOP 20 CIDADES -->
+                    <div class="bg-darkCard p-4 rounded-xl border border-slate-800 shadow">
+                        <h3 class="text-sm font-bold text-sumoOrange mb-3 flex items-center gap-2"><i class="fa-solid fa-map-location-dot"></i> Top 20 Cidades</h3>
+                        <div class="max-h-[320px] overflow-y-auto custom-scroll pr-1">
+                            <table class="w-full text-left text-xs text-slate-300">
+                                <thead class="sticky top-0 bg-darkCard z-10 shadow">
+                                    <tr class="border-b border-slate-700 text-slate-400">
+                                        <th class="py-2">CIDADE</th>
+                                        <th class="py-2 text-right">MÉD. POSIT</th>
+                                        <th class="py-2 text-right">MÉD. FAT</th>
+                                        <th class="py-2 text-right">MÉD. HL</th>
+                                        <th class="py-2 text-right">MoM % GERAL</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-cidades"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DESEMPENHO DE SUPERVISÃO -->
+                <div class="bg-darkCard p-5 rounded-xl border border-slate-800 shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-bold text-sumoOrange flex items-center gap-2"><i class="fa-solid fa-crown"></i> Performance de Supervisão & Equipes</h3>
+                        <span class="text-xs text-slate-400">Clique no supervisor para ver os vendedores da equipe</span>
+                    </div>
+                    
+                    <div id="supervisors-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+
+                    <div id="supervisor-team-container" class="mt-6 pt-4 border-t border-slate-800 hidden">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 id="team-title" class="text-xs font-bold text-aquaLight uppercase">Equipe de Vendedores</h4>
+                            <button onclick="closeSupervisorTeam()" class="text-xs text-slate-400 hover:text-white"><i class="fa-solid fa-xmark mr-1"></i>Fechar Equipe</button>
+                        </div>
+                        <div id="team-vendedores-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================= ABA 2: CAMPANHA DE AGOSTO ================= -->
+        <div id="tab-campanha" class="hidden space-y-6 animate-[fadeIn_0.5s_ease-in-out]">
+            <div class="bg-gradient-to-r from-aquaGreen to-emerald-900 p-8 rounded-2xl shadow-2xl border border-aquaLight/30 relative overflow-hidden flex flex-col md:flex-row items-center gap-8">
+                <div class="absolute right-0 top-0 opacity-10 pointer-events-none text-[200px] translate-x-1/4 -translate-y-1/4">🥥</div>
+                <div class="flex-1 z-10">
+                    <div class="inline-block bg-sumoOrange text-white px-3 py-1 rounded-full text-xs font-black tracking-widest uppercase mb-4 shadow-lg">Mês de Agosto</div>
+                    <h2 class="text-4xl font-black text-white mb-4 leading-tight drop-shadow-md">Corrida da Positivação<br><span class="text-aquaLight">AquaCoco & Sumo</span></h2>
+                    <p class="text-emerald-50 text-sm md:text-base max-w-2xl leading-relaxed mb-4">
+                        O desafio foi lançado! Para marcar ponto na semana, a regra é clara: <b class="text-white">venda combinada de AquaCoco + Sumo para o mesmo cliente (O Combo Obrigatório).</b> Fechou a semana? Zera tudo! O repeteco vale: você pode positivar o mesmo cliente na semana seguinte e garantir seus pontos novamente.
+                    </p>
+                    <div class="bg-black/40 border border-amber-500/30 p-3 rounded-xl mb-6 text-xs text-amber-200">
+                        <p class="font-bold uppercase tracking-wider mb-1 text-sumoOrange"><i class="fa-solid fa-scale-balanced mr-1"></i> Critérios de Desempate:</p>
+                        <ol class="list-decimal list-inside space-y-0.5 text-slate-300">
+                            <li><b>1º Maior Positivação Geral:</b> Maior quantidade total de clientes positivados na semana.</li>
+                            <li><b>2º Maior Faturamento Liquido:</b> Maior valor em R$ acumulado na semana correspondente.</li>
+                        </ol>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="bg-black/30 p-4 rounded-xl border border-white/10 backdrop-blur-sm flex-1 flex flex-col items-center text-center">
+                            <i class="fa-solid fa-money-bill-wave text-3xl text-aquaLight mb-2"></i>
+                            <h4 class="font-bold text-white text-sm">Top 4 Vendedores</h4>
+                            <p class="text-xs text-slate-300 mt-1">Os 4 melhores de cada semana ganham <b class="text-sumoOrange text-base">R$ 200</b> cada!</p>
+                        </div>
+                        <div class="bg-black/30 p-4 rounded-xl border border-white/10 backdrop-blur-sm flex-1 flex flex-col items-center text-center">
+                            <i class="fa-solid fa-crown text-3xl text-sumoOrange mb-2"></i>
+                            <h4 class="font-bold text-white text-sm">Top 1 Supervisor</h4>
+                            <p class="text-xs text-slate-300 mt-1">O supervisor destaque da semana também leva <b class="text-sumoOrange text-base">R$ 200</b>!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-darkCard p-4 rounded-xl border border-slate-800 flex items-center justify-between shadow">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-filter text-sumoOrange"></i>
+                    <span class="text-sm font-bold text-white">Filtrar por Semana:</span>
+                </div>
+                <select id="campaign-filter-semana" onchange="renderCampaignTab()" class="bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-aquaLight outline-none min-w-[200px]">
+                    <option value="">Todas as Semanas</option>
+                </select>
+            </div>
+
+            <div id="campaign-weeks-container" class="space-y-8"></div>
+        </div>
+    </main>
+
+    <!-- MODAL DETALHES DO PRODUTO -->
+    <div id="produto-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-[600px] w-full relative mx-auto flex flex-col">
+            <button onclick="closeModal('produto-modal')" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 h-10 w-10 flex items-center justify-center rounded-full transition z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="flex items-center gap-4 mb-4 border-b border-slate-800 pb-4">
+                <img id="modal-prod-img" src="" class="h-16 w-16 object-contain bg-white/5 p-2 rounded-xl border border-slate-700">
+                <div>
+                    <h3 id="modal-prod-nome" class="text-lg font-bold text-white">---</h3>
+                    <p id="modal-prod-codigo" class="text-xs text-slate-400">Código: ---</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 text-center mb-4">
+                <div class="bg-darkBg p-3 rounded-lg border border-slate-800">
+                    <span class="text-[10px] text-slate-400 uppercase block">Média Posit.</span>
+                    <span id="modal-prod-pos" class="text-sm font-bold text-sumoOrange">0 Clt</span>
+                </div>
+                <div class="bg-darkBg p-3 rounded-lg border border-slate-800">
+                    <span class="text-[10px] text-slate-400 uppercase block">Média Fat.</span>
+                    <span id="modal-prod-fat" class="text-sm font-bold text-emerald-400">R$ 0,00</span>
+                </div>
+                <div class="bg-darkBg p-3 rounded-lg border border-slate-800">
+                    <span class="text-[10px] text-slate-400 uppercase block">Média HL</span>
+                    <span id="modal-prod-hl" class="text-sm font-bold text-cyan-400">0,00 HL</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALHAMENTO DO VENDEDOR -->
+    <div id="vendedor-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center hidden z-50 p-2 sm:p-4">
+        <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-[1000px] w-full relative mx-auto flex flex-col max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('vendedor-modal')" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 h-10 w-10 flex items-center justify-center rounded-full transition z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <div class="flex items-center gap-5 border-b border-slate-800 pb-5 mb-5">
+                <img id="modal-vendedor-foto" src="" class="h-20 w-20 rounded-full object-cover border-2 border-aquaLight bg-slate-800 shadow-xl">
+                <div>
+                    <h3 id="modal-vendedor-nome" class="text-2xl font-black text-white">---</h3>
+                    <p id="modal-vendedor-sup" class="text-sm text-slate-400">Supervisor: ---</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+                <div class="bg-darkBg p-3 rounded-xl border border-slate-800 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">Média Posit. Mensal</p>
+                    <p id="modal-vendedor-total-pos" class="text-lg font-bold text-sumoOrange mt-1">0 Clientes</p>
+                </div>
+                <div class="bg-darkBg p-3 rounded-xl border border-slate-800 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">Média Fat. Mensal</p>
+                    <p id="modal-vendedor-total-fat" class="text-lg font-bold text-white mt-1">R$ 0,00</p>
+                </div>
+                <div class="bg-darkBg p-3 rounded-xl border border-slate-800 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">Média HL Mensal</p>
+                    <p id="modal-vendedor-total-hl" class="text-lg font-bold text-cyan-400 mt-1">0,00 HL</p>
+                </div>
+                <div class="bg-darkBg p-3 rounded-xl border border-slate-800 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">MoM % Crescimento Médio</p>
+                    <p id="modal-vendedor-mom-geral" class="text-lg font-bold text-emerald-400 mt-1">0,00%</p>
+                </div>
+            </div>
+
+            <h4 class="text-xs font-bold text-sumoOrange uppercase mb-3">Evolução Mensal no Ano</h4>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead>
+                        <tr class="border-b border-slate-700 text-slate-400 bg-darkBg">
+                            <th class="py-2 px-3">MÊS</th>
+                            <th class="py-2 px-3 text-right">POSITIVAÇÃO</th>
+                            <th class="py-2 px-3 text-right">FATURAMENTO</th>
+                            <th class="py-2 px-3 text-right">HECTOLITRO (HL)</th>
+                            <th class="py-2 px-3 text-right">MoM % MÊS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-vendedor-tabela" class="divide-y divide-slate-800"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS PRINCIPAL -->
+    <script>
+        let myChart = null;
+        let globalData = [];
+        let selectedSupervisor = null;
+        const mesesOrdem = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+        function switchTab(tabId) {
+            document.getElementById('tab-geral').classList.add('hidden');
+            document.getElementById('tab-campanha').classList.add('hidden');
+            
+            document.getElementById('btn-tab-geral').className = "px-6 py-2.5 rounded-full text-sm font-bold bg-darkCard text-slate-400 border border-slate-700 hover:text-white transition-all";
+            document.getElementById('btn-tab-campanha').className = "px-6 py-2.5 rounded-full text-sm font-bold bg-darkCard text-slate-400 border border-slate-700 hover:text-white transition-all";
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            
+            if(tabId === 'geral') {
+                document.getElementById('btn-tab-geral').className = "px-6 py-2.5 rounded-full text-sm font-bold bg-aquaGreen text-white transition-all shadow-[0_0_15px_rgba(0,140,69,0.4)] border border-aquaLight";
+            } else {
+                document.getElementById('btn-tab-campanha').className = "px-6 py-2.5 rounded-full text-sm font-bold bg-sumoOrange text-white transition-all shadow-[0_0_15px_rgba(241,90,36,0.4)] border border-amber-400";
+            }
+        }
+
+        // CARREGAMENTO DOS ARQUIVOS SEPARADOS POR TRIMESTRE
+        document.addEventListener("DOMContentLoaded", () => {
+            const timestamp = new Date().getTime();
+            const jsonFiles = [
+                `data_q1.json?t=${timestamp}`,
+                `data_q2.json?t=${timestamp}`,
+                `data_q3.json?t=${timestamp}`,
+                `data_q4.json?t=${timestamp}`
+            ];
+
+            Promise.all(jsonFiles.map(file => 
+                fetch(file)
+                    .then(res => res.ok ? res.json() : [])
+                    .catch(err => {
+                        console.warn(`Aviso ao carregar ${file}:`, err);
+                        return [];
+                    })
+            ))
+            .then(results => {
+                // Junta todos os trimestres em um único array
+                globalData = results.flat();
+                
+                if (globalData.length === 0) {
+                    console.error("Nenhum dado pôde ser carregado dos arquivos JSON.");
+                    return;
+                }
+
+                populateFilters();
+                updateDashboard();
+                populateCampaignWeekFilter();
+                renderCampaignTab();
+            })
+            .catch(err => console.error("Erro na inicialização dos dados:", err));
+        });
+
+        function formatCurrency(val) { return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+        function formatHL(val) { return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' HL'; }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        
+        function clearFilters() {
+            document.getElementById('filter-marca').value = '';
+            document.getElementById('filter-ano').value = '';
+            document.getElementById('filter-mes').value = '';
+            document.getElementById('filter-supervisor').value = '';
+            document.getElementById('filter-vendedor').value = '';
+            closeSupervisorTeam();
+            updateDashboard();
+        }
+
+        function calcGrowth(atual, anterior) {
+            if (!anterior || anterior === 0) return 0;
+            return ((atual - anterior) / anterior) * 100;
+        }
+
+        function populateFilters() {
+            const marcas = [...new Set(globalData.map(item => item.Marca))].filter(Boolean);
+            const anos = [...new Set(globalData.map(item => item.Ano))].filter(Boolean);
+            const meses = [...new Set(globalData.map(item => item.Mês))].filter(Boolean);
+            const supervisores = [...new Set(globalData.map(item => item.Supervisor))].filter(Boolean);
+            const vendedores = [...new Set(globalData.map(item => item.Vendedor))].filter(Boolean);
+
+            const buildSel = (id, items) => {
+                const el = document.getElementById(id);
+                if(el) el.innerHTML = `<option value="">Todos</option>` + items.sort().map(i => `<option value="${i}">${i}</option>`).join('');
+            };
+
+            buildSel('filter-marca', marcas);
+            buildSel('filter-ano', anos); 
+            buildSel('filter-mes', meses);
+            buildSel('filter-supervisor', supervisores); 
+            buildSel('filter-vendedor', vendedores);
+        }
+
+        function updateDashboard() {
+            const fMarca = document.getElementById('filter-marca').value;
+            const fAno = document.getElementById('filter-ano').value;
+            const fMes = document.getElementById('filter-mes').value;
+            const fSup = document.getElementById('filter-supervisor').value;
+            const fVen = document.getElementById('filter-vendedor').value;
+
+            const filtered = globalData.filter(item => {
+                return (!fMarca || item.Marca === fMarca) &&
+                       (!fAno || String(item.Ano) === fAno) &&
+                       (!fMes || item.Mês === fMes) &&
+                       (!fSup || item.Supervisor === fSup) &&
+                       (!fVen || item.Vendedor === fVen);
+            });
+
+            let mensalConsolidado = {};
+            filtered.forEach(item => {
+                const m = item.Mês || "Desc";
+                const vL = parseFloat(item.FaturamentoLiquido || 0);
+                const hl = parseFloat(item.Hectolitros || 0);
+                const cl = item.Cliente;
+                
+                if (!mensalConsolidado[m]) mensalConsolidado[m] = { fat: 0, hl: 0, clientes: new Set() };
+                mensalConsolidado[m].fat += vL;
+                mensalConsolidado[m].hl += hl;
+                if(cl && vL > 0) mensalConsolidado[m].clientes.add(cl);
+            });
+
+            const mAtivos = Object.keys(mensalConsolidado).sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b));
+            let sFat=0, sCl=0, sHL=0;
+            mAtivos.forEach(m => { 
+                sFat += mensalConsolidado[m].fat; 
+                sCl += mensalConsolidado[m].clientes.size; 
+                sHL += mensalConsolidado[m].hl;
+            });
+            
+            const tot = mAtivos.length || 1;
+            const avgFat = sFat / tot;
+            const avgPos = sCl / tot;
+            const avgHL = sHL / tot;
+
+            let momPos = 0, momFat = 0, momHL = 0, momTicket = 0, momGeral = 0;
+            
+            let mFechados = [...mAtivos];
+            if (mFechados.length >= 3) {
+                mFechados.pop(); 
+            }
+
+            if (mFechados.length >= 2) {
+                const ult = mFechados[mFechados.length - 1];
+                const pen = mFechados[mFechados.length - 2];
+                
+                const tktUlt = mensalConsolidado[ult].clientes.size > 0 ? (mensalConsolidado[ult].fat / mensalConsolidado[ult].clientes.size) : 0;
+                const tktPen = mensalConsolidado[pen].clientes.size > 0 ? (mensalConsolidado[pen].fat / mensalConsolidado[pen].clientes.size) : 0;
+
+                momFat = calcGrowth(mensalConsolidado[ult].fat, mensalConsolidado[pen].fat);
+                momPos = calcGrowth(mensalConsolidado[ult].clientes.size, mensalConsolidado[pen].clientes.size);
+                momHL = calcGrowth(mensalConsolidado[ult].hl, mensalConsolidado[pen].hl);
+                momTicket = calcGrowth(tktUlt, tktPen);
+                
+                momGeral = (momPos + momFat + momHL) / 3;
+            }
+
+            document.getElementById('kpi-hectolitro').innerText = formatHL(avgHL);
+            document.getElementById('mom-hectolitro').innerText = `MoM: ${momHL.toFixed(2)}%`;
+            
+            document.getElementById('kpi-faturamento').innerText = formatCurrency(avgFat);
+            document.getElementById('mom-faturamento').innerText = `MoM: ${momFat.toFixed(2)}%`;
+
+            document.getElementById('kpi-positivacao').innerText = `${Math.round(avgPos)} Clientes/Mês`;
+            document.getElementById('mom-positivacao').innerText = `MoM: ${momPos.toFixed(2)}%`;
+
+            document.getElementById('kpi-mom-geral').innerText = `${momGeral >= 0 ? '+' : ''}${momGeral.toFixed(2)}%`;
+            document.getElementById('kpi-mom-geral').className = `text-2xl font-bold mt-1 ${momGeral >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
+
+            const avgTicket = avgPos > 0 ? avgFat / avgPos : 0;
+            document.getElementById('kpi-ticket').innerText = formatCurrency(avgTicket);
+            document.getElementById('mom-ticket').innerText = `MoM: ${momTicket.toFixed(2)}%`;
+
+            renderChart(mAtivos, mensalConsolidado);
+            renderTopProdutos(filtered);
+            renderTopCidades(filtered);
+            renderSupervisores(filtered);
+        }
+
+        // RENDER CHART COM ESCALA LOGARÍTMICA
+        function renderChart(meses, dados) {
+            const ctx = document.getElementById('chart-evolucao').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                data: {
+                    labels: meses,
+                    datasets: [
+                        { 
+                            type: 'line', 
+                            label: 'Fat. Líquido (R$)', 
+                            data: meses.map(m => dados[m].fat), 
+                            borderColor: '#8DC63F', 
+                            backgroundColor: '#8DC63F',
+                            borderWidth: 3, 
+                            yAxisID: 'y' 
+                        },
+                        { 
+                            type: 'line', 
+                            label: 'Hectolitros (HL)', 
+                            data: meses.map(m => dados[m].hl), 
+                            borderColor: '#06b6d4', 
+                            backgroundColor: '#06b6d4',
+                            borderWidth: 2, 
+                            borderDash: [5, 5], 
+                            yAxisID: 'y' 
+                        },
+                        { 
+                            type: 'bar', 
+                            label: 'Positivação (Clt)', 
+                            data: meses.map(m => dados[m].clientes.size), 
+                            backgroundColor: 'rgba(241, 90, 36, 0.4)', 
+                            borderColor: '#F15A24',
+                            borderWidth: 1,
+                            yAxisID: 'y1' 
+                        }
+                    ]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#94a3b8',
+                                font: { size: 11 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.dataset.yAxisID === 'y1') {
+                                        label += context.raw + ' Clientes';
+                                    } else if (context.dataset.label.includes('HL')) {
+                                        label += formatHL(context.raw);
+                                    } else {
+                                        label += formatCurrency(context.raw);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: { 
+                        y: { 
+                            type: 'logarithmic',
+                            position: 'left',
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(value) {
+                                    if (value >= 1000) return (value / 1000).toFixed(0) + 'k';
+                                    return value;
+                                }
+                            },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        }, 
+                        y1: { 
+                            type: 'linear',
+                            position: 'right', 
+                            ticks: { color: '#F15A24' },
+                            grid: { drawOnChartArea: false } 
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        }
+                    } 
+                }
+            });
+        }
+
+        // RANKING DE VENDAS POR PRODUTOS (ORDENAÇÃO: 1º POSIT, 2º FAT, 3º HL)
+        function renderTopProdutos(data) {
+            let pData = {};
+            data.forEach(i => {
+                if(parseFloat(i.FaturamentoLiquido) > 0 && i.Produto) {
+                    const m = i.Mês || "Desc";
+                    const cod = String(i.CodigoProduto || "").trim();
+                    if(!pData[i.Produto]) pData[i.Produto] = { cod: cod, fat: 0, hl: 0, pos: new Set(), porMes: {} };
+                    pData[i.Produto].fat += parseFloat(i.FaturamentoLiquido);
+                    pData[i.Produto].hl += parseFloat(i.Hectolitros || 0);
+                    pData[i.Produto].pos.add(i.Cliente);
+
+                    if(!pData[i.Produto].porMes[m]) pData[i.Produto].porMes[m] = { fat: 0, hl: 0, pos: new Set() };
+                    pData[i.Produto].porMes[m].fat += parseFloat(i.FaturamentoLiquido);
+                    pData[i.Produto].porMes[m].hl += parseFloat(i.Hectolitros || 0);
+                    pData[i.Produto].porMes[m].pos.add(i.Cliente);
+                }
+            });
+
+            const tb = document.getElementById('table-produtos');
+            
+            const produtosArray = Object.entries(pData).map(([n, d]) => {
+                const mKeys = Object.keys(d.porMes).sort((a,b)=>mesesOrdem.indexOf(a)-mesesOrdem.indexOf(b));
+                const totM = mKeys.length || 1;
+                const avgFat = d.fat / totM;
+                const avgPos = d.pos.size / totM;
+                const avgHL = d.hl / totM;
+
+                let mFechados = [...mKeys];
+                if(mFechados.length >= 3) mFechados.pop();
+
+                let mom = 0;
+                if(mFechados.length >= 2) {
+                    const u = mFechados[mFechados.length-1], p = mFechados[mFechados.length-2];
+                    const gFat = calcGrowth(d.porMes[u].fat, d.porMes[p].fat);
+                    const gPos = calcGrowth(d.porMes[u].pos.size, d.porMes[p].pos.size);
+                    const gHL  = calcGrowth(d.porMes[u].hl, d.porMes[p].hl);
+                    mom = (gFat + gPos + gHL) / 3;
+                }
+
+                return { nome: n, cod: d.cod, avgFat, avgPos, avgHL, mom };
+            });
+
+            produtosArray.sort((a, b) => {
+                if (b.avgPos !== a.avgPos) return b.avgPos - a.avgPos;
+                if (b.avgFat !== a.avgFat) return b.avgFat - a.avgFat;
+                return b.avgHL - a.avgHL;
+            });
+
+            tb.innerHTML = produtosArray.slice(0, 20).map(item => {
+                const imgPath = `./Imagens_produtos/${item.cod}.png`;
+                return `
+                <tr onclick="openProdutoModal('${item.nome}', '${item.cod}', ${item.avgFat}, ${item.avgPos}, ${item.avgHL})" class="border-b border-slate-800 hover:bg-slate-800/60 cursor-pointer transition">
+                    <td class="py-2">
+                        <img src="${imgPath}" onerror="this.src='https://via.placeholder.com/50/112218/ffffff?text=P'" class="h-8 w-8 object-contain bg-white/5 p-1 rounded border border-slate-700">
+                    </td>
+                    <td class="py-2"><span class="font-medium text-slate-200 truncate max-w-[130px] block" title="${item.nome}">${item.nome}</span></td>
+                    <td class="py-2 text-right text-sumoOrange font-bold">${Math.round(item.avgPos)} Clt</td>
+                    <td class="py-2 text-right font-semibold text-white">${formatCurrency(item.avgFat)}</td>
+                    <td class="py-2 text-right text-cyan-400 font-semibold">${formatHL(item.avgHL)}</td>
+                    <td class="py-2 text-right ${item.mom>=0?'text-emerald-400':'text-red-400'} font-bold">${item.mom.toFixed(2)}%</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function openProdutoModal(nome, cod, fat, pos, hl) {
+            document.getElementById('modal-prod-nome').innerText = nome;
+            document.getElementById('modal-prod-codigo').innerText = `Código: ${cod}`;
+            document.getElementById('modal-prod-fat').innerText = formatCurrency(fat);
+            document.getElementById('modal-prod-pos').innerText = `${Math.round(pos)} Clt`;
+            document.getElementById('modal-prod-hl').innerText = formatHL(hl);
+            document.getElementById('modal-prod-img').src = `./Imagens_produtos/${cod}.png`;
+            document.getElementById('modal-prod-img').onerror = function() { this.src = 'https://via.placeholder.com/100/112218/fff?text=P'; };
+            document.getElementById('produto-modal').classList.remove('hidden');
+        }
+
+        // TOP 20 CIDADES (ORDENAÇÃO: 1º POSIT, 2º FAT, 3º HL)
+        function renderTopCidades(data) {
+            let cData = {};
+            data.forEach(i => {
+                if(i.Cidade) {
+                    const m = i.Mês || "Desc";
+                    if(!cData[i.Cidade]) cData[i.Cidade] = { fat: 0, hl: 0, pos: new Set(), porMes: {} };
+                    const vl = parseFloat(i.FaturamentoLiquido||0);
+                    const hl = parseFloat(i.Hectolitros||0);
+                    
+                    cData[i.Cidade].fat += vl;
+                    cData[i.Cidade].hl += hl;
+                    if(vl > 0 && i.Cliente) cData[i.Cidade].pos.add(i.Cliente);
+
+                    if(!cData[i.Cidade].porMes[m]) cData[i.Cidade].porMes[m] = { fat: 0, hl: 0, pos: new Set() };
+                    cData[i.Cidade].porMes[m].fat += vl;
+                    cData[i.Cidade].porMes[m].hl += hl;
+                    if(vl > 0 && i.Cliente) cData[i.Cidade].porMes[m].pos.add(i.Cliente);
+                }
+            });
+
+            const tb = document.getElementById('table-cidades');
+
+            const cidadesArray = Object.entries(cData).map(([n, d]) => {
+                const mKeys = Object.keys(d.porMes).sort((a,b)=>mesesOrdem.indexOf(a)-mesesOrdem.indexOf(b));
+                const totM = mKeys.length || 1;
+                const avgFat = d.fat / totM;
+                const avgPos = d.pos.size / totM;
+                const avgHL = d.hl / totM;
+
+                let mFechados = [...mKeys];
+                if(mFechados.length >= 3) mFechados.pop();
+
+                let mom = 0;
+                if(mFechados.length >= 2) {
+                    const u = mFechados[mFechados.length-1], p = mFechados[mFechados.length-2];
+                    const gFat = calcGrowth(d.porMes[u].fat, d.porMes[p].fat);
+                    const gPos = calcGrowth(d.porMes[u].pos.size, d.porMes[p].pos.size);
+                    const gHL  = calcGrowth(d.porMes[u].hl, d.porMes[p].hl);
+                    mom = (gFat + gPos + gHL) / 3;
+                }
+
+                return { nome: n, avgFat, avgPos, avgHL, mom };
+            });
+
+            cidadesArray.sort((a, b) => {
+                if (b.avgPos !== a.avgPos) return b.avgPos - a.avgPos;
+                if (b.avgFat !== a.avgFat) return b.avgFat - a.avgFat;
+                return b.avgHL - a.avgHL;
+            });
+
+            tb.innerHTML = cidadesArray.slice(0, 20).map(item => {
+                return `
+                <tr class="border-b border-slate-800 hover:bg-slate-800/40 transition">
+                    <td class="py-2 font-medium text-slate-200">${item.nome}</td>
+                    <td class="py-2 text-right text-sumoOrange font-bold">${Math.round(item.avgPos)} Clt</td>
+                    <td class="py-2 text-right font-semibold text-white">${formatCurrency(item.avgFat)}</td>
+                    <td class="py-2 text-right text-cyan-400 font-semibold">${formatHL(item.avgHL)}</td>
+                    <td class="py-2 text-right ${item.mom>=0?'text-emerald-400':'text-red-400'} font-bold">${item.mom.toFixed(2)}%</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // PERFORMANCE DE SUPERVISÃO
+        function renderSupervisores(data) {
+            let sData = {};
+            data.forEach(i => {
+                if(i.Supervisor) {
+                    if(!sData[i.Supervisor]) sData[i.Supervisor] = { fat:0, cod: i.CodigoSupervisor, vens: new Map() };
+                    sData[i.Supervisor].fat += parseFloat(i.FaturamentoLiquido||0);
+                    if(i.Vendedor) {
+                        sData[i.Supervisor].vens.set(i.Vendedor, i.CodigoVendedor);
+                    }
+                }
+            });
+
+            document.getElementById('supervisors-grid').innerHTML = Object.entries(sData).sort((a,b)=>b[1].fat - a[1].fat).map(([n,d]) => {
+                const c = String(d.cod).trim();
+                const isSelected = selectedSupervisor === n;
+                return `
+                <div onclick="selectSupervisor('${n}')" class="bg-darkBg border ${isSelected ? 'border-aquaLight ring-2 ring-aquaLight/50' : 'border-slate-800'} p-4 rounded-xl flex items-center gap-4 hover:border-aquaLight cursor-pointer transition">
+                    <img class="h-14 w-14 rounded-full object-cover border-2 border-slate-700 bg-slate-800 shrink-0" src="Imagens_Supervisores/${c}.png" onerror="this.src='https://via.placeholder.com/150/112218/ffffff?text=S'">
+                    <div>
+                        <h4 class="text-sm font-bold text-white">${n}</h4>
+                        <p class="text-xs text-aquaLight mt-0.5">${formatCurrency(d.fat)}</p>
+                        <p class="text-[10px] text-slate-400 mt-1"><i class="fa-solid fa-users mr-1"></i>${d.vens.size} Vendedores</p>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function selectSupervisor(supNome) {
+            selectedSupervisor = supNome;
+            renderSupervisores(globalData);
+
+            const vData = globalData.filter(i => i.Supervisor === supNome);
+            let vMap = {};
+            vData.forEach(i => {
+                if(i.Vendedor) {
+                    if(!vMap[i.Vendedor]) vMap[i.Vendedor] = { cod: i.CodigoVendedor, fat: 0, pos: new Set() };
+                    const vl = parseFloat(i.FaturamentoLiquido || 0);
+                    vMap[i.Vendedor].fat += vl;
+                    if(vl > 0 && i.Cliente) vMap[i.Vendedor].pos.add(i.Cliente);
+                }
+            });
+
+            document.getElementById('team-title').innerText = `Equipe de Vendedores de: ${supNome}`;
+            const grid = document.getElementById('team-vendedores-grid');
+            
+            grid.innerHTML = Object.entries(vMap).sort((a,b)=>b[1].fat - a[1].fat).map(([vNome, d]) => {
+                const c = String(d.cod).trim();
+                return `
+                <div onclick="openVendedorModal('${vNome}')" class="bg-darkBg p-3 rounded-lg border border-slate-800 hover:border-aquaLight cursor-pointer transition flex items-center gap-3">
+                    <img src="Imagens_Vendedores/${c}.png" onerror="this.src='https://via.placeholder.com/100/112218/fff?text=V'" class="h-10 w-10 rounded-full object-cover border border-slate-700 shrink-0">
+                    <div class="min-w-0 flex-1">
+                        <h5 class="text-xs font-bold text-white truncate">${vNome}</h5>
+                        <p class="text-[10px] text-emerald-400 font-semibold">${formatCurrency(d.fat)}</p>
+                        <p class="text-[10px] text-slate-400">${d.pos.size} Clientes</p>
+                    </div>
+                </div>`;
+            }).join('');
+
+            document.getElementById('supervisor-team-container').classList.remove('hidden');
+        }
+
+        function closeSupervisorTeam() {
+            selectedSupervisor = null;
+            document.getElementById('supervisor-team-container').classList.add('hidden');
+            renderSupervisores(globalData);
+        }
+
+        // DETALHAMENTO DO VENDEDOR (MODAL)
+        function openVendedorModal(vendedorNome) {
+            const vData = globalData.filter(i => i.Vendedor === vendedorNome);
+            if(vData.length === 0) return;
+
+            const sup = vData[0].Supervisor || "Sem Supervisor";
+            const cod = vData[0].CodigoVendedor || "";
+
+            document.getElementById('modal-vendedor-nome').innerText = vendedorNome;
+            document.getElementById('modal-vendedor-sup').innerText = `Supervisor: ${sup}`;
+            document.getElementById('modal-vendedor-foto').src = `Imagens_Vendedores/${String(cod).trim()}.png`;
+            document.getElementById('modal-vendedor-foto').onerror = function() { this.src = 'https://via.placeholder.com/100/112218/fff?text=V'; };
+
+            let porMes = {};
+            vData.forEach(i => {
+                const m = i.Mês || "Outros";
+                if(!porMes[m]) porMes[m] = { fat: 0, hl: 0, pos: new Set() };
+                const vl = parseFloat(i.FaturamentoLiquido||0);
+                const hl = parseFloat(i.Hectolitros||0);
+                porMes[m].fat += vl;
+                porMes[m].hl += hl;
+                if(vl > 0 && i.Cliente) porMes[m].pos.add(i.Cliente);
+            });
+
+            const mKeys = Object.keys(porMes).sort((a,b)=>mesesOrdem.indexOf(a)-mesesOrdem.indexOf(b));
+            const totM = mKeys.length || 1;
+
+            let sFat = 0, sHL = 0, sPos = 0;
+            mKeys.forEach(m => {
+                sFat += porMes[m].fat;
+                sHL += porMes[m].hl;
+                sPos += porMes[m].pos.size;
+            });
+
+            document.getElementById('modal-vendedor-total-fat').innerText = formatCurrency(sFat / totM);
+            document.getElementById('modal-vendedor-total-pos').innerText = `${Math.round(sPos / totM)} Clientes/Mês`;
+            document.getElementById('modal-vendedor-total-hl').innerText = formatHL(sHL / totM);
+
+            let htmlTabela = "";
+            let somaMoms = 0, countMoms = 0;
+
+            mKeys.forEach((m, idx) => {
+                let mom = 0;
+                if(idx > 0) {
+                    const prevM = mKeys[idx-1];
+                    const gFat = calcGrowth(porMes[m].fat, porMes[prevM].fat);
+                    const gPos = calcGrowth(porMes[m].pos.size, porMes[prevM].pos.size);
+                    const gHL  = calcGrowth(porMes[m].hl, porMes[prevM].hl);
+                    mom = (gFat + gPos + gHL) / 3;
+                    somaMoms += mom;
+                    countMoms++;
+                }
+
+                htmlTabela += `
+                <tr>
+                    <td class="py-2.5 px-3 font-semibold text-white">${m}</td>
+                    <td class="py-2.5 px-3 text-right text-sumoOrange font-bold">${porMes[m].pos.size} Clt</td>
+                    <td class="py-2.5 px-3 text-right text-emerald-400 font-semibold">${formatCurrency(porMes[m].fat)}</td>
+                    <td class="py-2.5 px-3 text-right text-cyan-400 font-semibold">${formatHL(porMes[m].hl)}</td>
+                    <td class="py-2.5 px-3 text-right ${mom>=0?'text-emerald-400':'text-red-400'} font-bold">${mom.toFixed(2)}%</td>
+                </tr>`;
+            });
+
+            const momGeralMedio = countMoms > 0 ? somaMoms / countMoms : 0;
+            document.getElementById('modal-vendedor-mom-geral').innerText = `${momGeralMedio >= 0 ? '+' : ''}${momGeralMedio.toFixed(2)}%`;
+
+            document.getElementById('modal-vendedor-tabela').innerHTML = htmlTabela;
+            document.getElementById('vendedor-modal').classList.remove('hidden');
+        }
+
+        // CAMPANHA DE AGOSTO
+        function populateCampaignWeekFilter() {
+            const dataAgosto = globalData.filter(d => d.Mês === 'Agosto' && parseFloat(d.VendaBruta) > 0);
+            const semanasSet = new Set(dataAgosto.map(d => d.Semana));
+            const semanas = Array.from(semanasSet).sort((a,b) => a - b);
+            
+            const sel = document.getElementById('campaign-filter-semana');
+            let cont = 1;
+            sel.innerHTML = `<option value="">Todas as Semanas</option>` + semanas.map(s => `<option value="${s}">Semana ${cont++} (ISO ${s})</option>`).join('');
+        }
+
+        function renderCampaignTab() {
+            const container = document.getElementById('campaign-weeks-container');
+            container.innerHTML = "";
+
+            const fSemana = document.getElementById('campaign-filter-semana').value;
+            const dataAgosto = globalData.filter(d => d.Mês === 'Agosto' && parseFloat(d.VendaBruta) > 0 && (!fSemana || String(d.Semana) === fSemana));
+            
+            if (dataAgosto.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center bg-darkCard border border-slate-800 rounded-xl"><p class="text-slate-400">Nenhum registro encontrado para o filtro selecionado.</p></div>`;
+                return;
+            }
+
+            const semanasSet = new Set(dataAgosto.map(d => d.Semana));
+            const semanas = Array.from(semanasSet).sort((a,b) => a - b);
+            
+            let campaignData = {};
+            semanas.forEach(s => { campaignData[s] = { vendedores: {}, supervisores: {} }; });
+
+            dataAgosto.forEach(i => {
+                const s = i.Semana;
+                const ven = i.Vendedor;
+                const sup = i.Supervisor;
+                const cliente = i.Cliente;
+                const marca = String(i.Marca).trim().toUpperCase(); 
+                const fat = parseFloat(i.FaturamentoLiquido || 0);
+                
+                if(!cliente || !ven) return;
+                
+                if(!campaignData[s].vendedores[ven]) {
+                    campaignData[s].vendedores[ven] = { cod: i.CodigoVendedor, sup: sup, clientes: {}, totalFatSemana: 0, posGeralSet: new Set() };
+                }
+                campaignData[s].vendedores[ven].totalFatSemana += fat;
+                if(fat > 0) campaignData[s].vendedores[ven].posGeralSet.add(cliente);
+
+                if(!campaignData[s].vendedores[ven].clientes[cliente]) campaignData[s].vendedores[ven].clientes[cliente] = new Set();
+                
+                if (marca === 'AQUACOCO') campaignData[s].vendedores[ven].clientes[cliente].add('AQUACOCO');
+                if (marca === 'SUMO') campaignData[s].vendedores[ven].clientes[cliente].add('SUMO');
+
+                if(sup) {
+                    if(!campaignData[s].supervisores[sup]) campaignData[s].supervisores[sup] = { cod: i.CodigoSupervisor, clientes: {} };
+                    if(!campaignData[s].supervisores[sup].clientes[cliente]) campaignData[s].supervisores[sup].clientes[cliente] = new Set();
+                    if (marca === 'AQUACOCO') campaignData[s].supervisores[sup].clientes[cliente].add('AQUACOCO');
+                    if (marca === 'SUMO') campaignData[s].supervisores[sup].clientes[cliente].add('SUMO');
+                }
+            });
+
+            semanas.forEach(s => {
+                let rankV = [];
+                for(let ven in campaignData[s].vendedores) {
+                    let ptsCombo = 0;
+                    for(let c in campaignData[s].vendedores[ven].clientes) {
+                        const m = campaignData[s].vendedores[ven].clientes[c];
+                        if(m.has('AQUACOCO') && m.has('SUMO')) ptsCombo++;
+                    }
+                    if(ptsCombo > 0) {
+                        rankV.push({ 
+                            nome: ven, 
+                            cod: campaignData[s].vendedores[ven].cod, 
+                            pts: ptsCombo, 
+                            sup: campaignData[s].vendedores[ven].sup,
+                            posGeral: campaignData[s].vendedores[ven].posGeralSet.size,
+                            fatSemana: campaignData[s].vendedores[ven].totalFatSemana
+                        });
+                    }
+                }
+
+                rankV.sort((a,b) => {
+                    if (b.pts !== a.pts) return b.pts - a.pts;
+                    if (b.posGeral !== a.posGeral) return b.posGeral - a.posGeral;
+                    return b.fatSemana - a.fatSemana;
+                });
+
+                let rankS = [];
+                for(let sup in campaignData[s].supervisores) {
+                    let pts = 0;
+                    for(let c in campaignData[s].supervisores[sup].clientes) {
+                        const m = campaignData[s].supervisores[sup].clientes[c];
+                        if(m.has('AQUACOCO') && m.has('SUMO')) pts++;
+                    }
+                    if(pts > 0) rankS.push({ nome: sup, cod: campaignData[s].supervisores[sup].cod, pts: pts });
+                }
+                rankS.sort((a,b) => b.pts - a.pts);
+                const top1S = rankS.length > 0 ? rankS[0] : null;
+
+                if(rankV.length === 0 && !top1S) return;
+
+                let vHTML = rankV.map((v, i) => {
+                    const eGanhador = i < 4;
+                    return `
+                    <div onclick="openVendedorModal('${v.nome}')" class="flex items-center gap-3 p-3 bg-darkBg border ${eGanhador ? 'border-sumoOrange/60' : 'border-slate-800'} rounded-xl hover:border-aquaLight cursor-pointer transition relative overflow-hidden group">
+                        <div class="font-black text-lg w-6 text-center ${i===0?'text-amber-400':i===1?'text-slate-300':i===2?'text-amber-700':i===3?'text-aquaLight':'text-slate-500'}">${i+1}º</div>
+                        <img src="Imagens_Vendedores/${String(v.cod).trim()}.png" onerror="this.src='https://via.placeholder.com/100/112218/fff?text=V'" class="h-11 w-11 rounded-full object-cover border-2 border-slate-600 bg-slate-800 z-10 shrink-0">
+                        <div class="flex-1 z-10 min-w-0">
+                            <h4 class="text-xs font-bold text-white truncate">${v.nome}</h4>
+                            <p class="text-[10px] text-slate-400 truncate">${v.sup}</p>
+                            <span class="inline-block mt-0.5 text-[10px] text-aquaLight bg-aquaGreen/20 px-1.5 py-0.5 rounded font-semibold">Posit. Geral: ${v.posGeral} Clt</span>
+                        </div>
+                        <div class="text-right z-10 shrink-0">
+                            <div class="text-[10px] text-slate-400 uppercase">Combos</div>
+                            <div class="text-sm font-black text-white">${v.pts}</div>
+                        </div>
+                        ${eGanhador ? `
+                        <div class="bg-emerald-900/40 border border-emerald-500/30 px-2 py-1 rounded text-center ml-1 z-10 shrink-0">
+                            <i class="fa-solid fa-money-bill-wave text-emerald-400 text-xs block"></i>
+                            <span class="text-emerald-300 font-bold text-[10px] whitespace-nowrap">+ R$ 200</span>
+                        </div>` : ''}
+                    </div>`;
+                }).join('');
+
+                let sHTML = top1S ? `
+                    <div class="h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-darkBg to-slate-900 border border-aquaLight/30 rounded-2xl relative overflow-hidden shadow-lg">
+                        <i class="fa-solid fa-crown text-3xl text-sumoOrange mb-3 animate-bounce"></i>
+                        <img src="Imagens_Supervisores/${String(top1S.cod).trim()}.png" onerror="this.src='https://via.placeholder.com/150/112218/fff?text=S'" class="h-20 w-20 rounded-full object-cover border-4 border-aquaLight bg-slate-800 shadow-xl z-10 mb-2">
+                        <h4 class="text-base font-bold text-white text-center z-10">${top1S.nome}</h4>
+                        <p class="text-xs text-slate-300 text-center z-10 mb-3">Total Equipe: <b class="text-sumoOrange">${top1S.pts} Combos</b></p>
+                        <div class="inline-block bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 px-3 py-1 rounded-full font-black text-xs z-10">
+                            <i class="fa-solid fa-trophy mr-1"></i> R$ 200,00 Garantidos!
+                        </div>
+                    </div>
+                ` : `<div class="p-4 text-center text-slate-500">Aguardando dados da supervisão.</div>`;
+
+                container.innerHTML += `
+                    <div class="bg-darkCard border border-slate-800 rounded-2xl p-5 shadow-lg relative">
+                        <h3 class="text-base font-black text-aquaLight mb-4 pb-2 border-b border-slate-700/50 flex items-center justify-between">
+                            <span><i class="fa-solid fa-calendar-week mr-2"></i>Semana Ref. ISO ${s}</span>
+                            <span class="bg-white/10 text-white/60 text-xs px-2 py-0.5 rounded-full font-normal"><i class="fa-solid fa-check-double mr-1"></i>Válida</span>
+                        </h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="lg:col-span-2 space-y-2">
+                                <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">🏅 Ranking de Representantes (Barra de Rolagem Ativa)</h4>
+                                <div class="max-h-[350px] overflow-y-auto pr-2 space-y-2.5 custom-scroll">
+                                    ${vHTML || '<p class="text-slate-500 text-sm">Nenhum combo registrado nesta semana.</p>'}
+                                </div>
+                            </div>
+                            <div class="lg:col-span-1">
+                                <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">⭐ Melhor Supervisor</h4>
+                                ${sHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
