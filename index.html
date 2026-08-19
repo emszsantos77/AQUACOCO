@@ -210,13 +210,24 @@
                     <p class="text-emerald-50 text-sm md:text-base max-w-2xl leading-relaxed mb-4">
                         O desafio foi lançado! Para marcar ponto na semana, a regra é clara: <b class="text-white">venda combinada de AquaCoco + Sumo para o mesmo cliente (O Combo Obrigatório).</b> Fechou a semana? Zera tudo! O repeteco vale: você pode positivar o mesmo cliente na semana seguinte e garantir seus pontos novamente.
                     </p>
-                    <div class="bg-black/40 border border-amber-500/30 p-3 rounded-xl mb-6 text-xs text-amber-200">
-                        <p class="font-bold uppercase tracking-wider mb-1 text-sumoOrange"><i class="fa-solid fa-scale-balanced mr-1"></i> Critérios de Desempate:</p>
-                        <ol class="list-decimal list-inside space-y-0.5 text-slate-300">
-                            <li><b>1º Maior Positivação Geral:</b> Maior quantidade total de clientes positivados na semana.</li>
-                            <li><b>2º Maior Faturamento Liquido:</b> Maior valor em R$ acumulado na semana correspondente.</li>
-                        </ol>
+
+                    <!-- REGRAS E METAS ATUALIZADAS -->
+                    <div class="bg-black/40 border border-amber-500/30 p-4 rounded-xl mb-6 text-xs text-amber-200 space-y-2">
+                        <p class="font-bold uppercase tracking-wider text-sumoOrange flex items-center gap-2">
+                            <i class="fa-solid fa-bullseye"></i> Objetivos & Elegibilidade Mínima da Premiação:
+                        </p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-300">
+                            <li><b>Semana 1 (02 a 08/Ago):</b> Sem mínimo de combos para concorrer ao Top 4.</li>
+                            <li><b>Semana 2 (09 a 15/Ago):</b> Exigência de <b>no mínimo 15 Combos</b> para ter direito ao prêmio.</li>
+                            <li><b>Semana 3 (16 a 22/Ago):</b> Mínimo de <b>20 Combos</b> por vendedor, <b>80 Combos</b> pelo supervisor e <b>320 Combos</b> gerais da JBS Frios para ativar a campanha.</li>
+                            <li><b>Semana 4 (23 a 29/Ago):</b> Mínimo de <b>20 Combos</b> por vendedor, <b>80 Combos</b> pelo supervisor e <b>320 Combos</b> gerais da JBS Frios para ativar a campanha.</li>
+                        </ul>
+                        <div class="pt-2 border-t border-amber-500/20 text-slate-400">
+                            <p class="font-bold text-amber-300 uppercase"><i class="fa-solid fa-scale-balanced mr-1"></i> Critérios de Desempate:</p>
+                            <p><b>1º</b> Maior Nº de Combos &nbsp;|&nbsp; <b>2º</b> Maior Positivação Geral na Semana &nbsp;|&nbsp; <b>3º</b> Maior Faturamento na Semana</p>
+                        </div>
                     </div>
+
                     <div class="flex gap-4">
                         <div class="bg-black/30 p-4 rounded-xl border border-white/10 backdrop-blur-sm flex-1 flex flex-col items-center text-center">
                             <i class="fa-solid fa-money-bill-wave text-3xl text-aquaLight mb-2"></i>
@@ -232,17 +243,46 @@
                 </div>
             </div>
 
+            <!-- FILTRO DE SEMANA DA CAMPANHA -->
             <div class="bg-darkCard p-4 rounded-xl border border-slate-800 flex items-center justify-between shadow">
                 <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-filter text-sumoOrange"></i>
+                    <i class="fa-solid fa-filter text-sumoOrange text-base"></i>
                     <span class="text-sm font-bold text-white">Filtrar por Semana:</span>
                 </div>
-                <select id="campaign-filter-semana" onchange="renderCampaignTab()" class="bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-aquaLight outline-none min-w-[200px]">
-                    <option value="">Todas as Semanas</option>
+                <select id="campaign-filter-semana" onchange="renderCampaignTab()" class="bg-darkBg border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:border-aquaLight outline-none min-w-[240px]">
+                    <option value="1">Semana 1 (02 a 08/Ago)</option>
+                    <option value="2">Semana 2 (09 a 15/Ago)</option>
+                    <option value="3">Semana 3 (16 a 22/Ago)</option>
+                    <option value="4">Semana 4 (23 a 29/Ago)</option>
+                    <option value="todas">Todas as Semanas (Acumulado)</option>
                 </select>
             </div>
 
-            <div id="campaign-weeks-container" class="space-y-8"></div>
+            <!-- UNICO CARD DE RANKING DINÂMICO -->
+            <div id="campaign-ranking-card" class="bg-darkCard border border-slate-800 rounded-2xl p-5 shadow-lg relative">
+                <h3 id="campaign-week-title" class="text-base font-black text-aquaLight mb-4 pb-2 border-b border-slate-700/50 flex items-center justify-between">
+                    <span><i class="fa-solid fa-calendar-week mr-2"></i>Semana 1 (02 a 08/Ago)</span>
+                    <span id="campaign-week-badge" class="bg-emerald-900/30 text-emerald-300 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full"><i class="fa-solid fa-check mr-1"></i>Semana Válida</span>
+                </h3>
+                
+                <!-- ALERTA DE CAMPANHA NÃO ATIVADA -->
+                <div id="campaign-activation-alert" class="hidden mb-4 p-4 bg-red-950/40 border border-red-500/40 rounded-xl text-center">
+                    <i class="fa-solid fa-lock text-red-400 text-2xl mb-2"></i>
+                    <p class="text-red-200 font-bold text-sm">Campanha não ativada nesta semana</p>
+                    <p class="text-red-300/80 text-xs mt-1">Meta geral da JBS Frios: <b class="text-white">320 Combos</b>. Atual: <b id="campaign-total-combos" class="text-white">0</b> Combos.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 space-y-2">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">🏅 Ranking de Representantes (Barra de Rolagem Ativa)</h4>
+                        <div id="campaign-vendedores-container" class="max-h-[380px] overflow-y-auto pr-2 space-y-2.5 custom-scroll"></div>
+                    </div>
+                    <div class="lg:col-span-1">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">⭐ Melhor Supervisor</h4>
+                        <div id="campaign-supervisor-container" class="h-full"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -344,10 +384,10 @@
                 document.getElementById('btn-tab-geral').className = "px-6 py-2.5 rounded-full text-sm font-bold bg-aquaGreen text-white transition-all shadow-[0_0_15px_rgba(0,140,69,0.4)] border border-aquaLight";
             } else {
                 document.getElementById('btn-tab-campanha').className = "px-6 py-2.5 rounded-full text-sm font-bold bg-sumoOrange text-white transition-all shadow-[0_0_15px_rgba(241,90,36,0.4)] border border-amber-400";
+                renderCampaignTab();
             }
         }
 
-        // CARREGAMENTO DOS ARQUIVOS SEPARADOS POR TRIMESTRE
         document.addEventListener("DOMContentLoaded", () => {
             const timestamp = new Date().getTime();
             const jsonFiles = [
@@ -366,7 +406,6 @@
                     })
             ))
             .then(results => {
-                // Junta todos os trimestres em um único array
                 globalData = results.flat();
                 
                 if (globalData.length === 0) {
@@ -376,7 +415,6 @@
 
                 populateFilters();
                 updateDashboard();
-                populateCampaignWeekFilter();
                 renderCampaignTab();
             })
             .catch(err => console.error("Erro na inicialização dos dados:", err));
@@ -505,7 +543,6 @@
             renderSupervisores(filtered);
         }
 
-        // RENDER CHART COM ESCALA LOGARÍTMICA
         function renderChart(meses, dados) {
             const ctx = document.getElementById('chart-evolucao').getContext('2d');
             if (myChart) myChart.destroy();
@@ -548,12 +585,7 @@
                     responsive: true, 
                     maintainAspectRatio: false, 
                     plugins: {
-                        legend: {
-                            labels: {
-                                color: '#94a3b8',
-                                font: { size: 11 }
-                            }
-                        },
+                        legend: { labels: { color: '#94a3b8', font: { size: 11 } } },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
@@ -599,7 +631,6 @@
             });
         }
 
-        // RANKING DE VENDAS POR PRODUTOS (ORDENAÇÃO: 1º POSIT, 2º FAT, 3º HL)
         function renderTopProdutos(data) {
             let pData = {};
             data.forEach(i => {
@@ -675,7 +706,6 @@
             document.getElementById('produto-modal').classList.remove('hidden');
         }
 
-        // TOP 20 CIDADES (ORDENAÇÃO: 1º POSIT, 2º FAT, 3º HL)
         function renderTopCidades(data) {
             let cData = {};
             data.forEach(i => {
@@ -738,7 +768,6 @@
             }).join('');
         }
 
-        // PERFORMANCE DE SUPERVISÃO
         function renderSupervisores(data) {
             let sData = {};
             data.forEach(i => {
@@ -806,7 +835,6 @@
             renderSupervisores(globalData);
         }
 
-        // DETALHAMENTO DO VENDEDOR (MODAL)
         function openVendedorModal(vendedorNome) {
             const vData = globalData.filter(i => i.Vendedor === vendedorNome);
             if(vData.length === 0) return;
@@ -876,160 +904,232 @@
             document.getElementById('vendedor-modal').classList.remove('hidden');
         }
 
-        // CAMPANHA DE AGOSTO
-        function populateCampaignWeekFilter() {
-            const dataAgosto = globalData.filter(d => d.Mês === 'Agosto' && parseFloat(d.VendaBruta) > 0);
-            const semanasSet = new Set(dataAgosto.map(d => d.Semana));
-            const semanas = Array.from(semanasSet).sort((a,b) => a - b);
-            
-            const sel = document.getElementById('campaign-filter-semana');
-            let cont = 1;
-            sel.innerHTML = `<option value="">Todas as Semanas</option>` + semanas.map(s => `<option value="${s}">Semana ${cont++} (ISO ${s})</option>`).join('');
-        }
-
+        // RENDERIZADOR DO RANKING DA CAMPANHA (COM REGRAS COMBO-ONLY)
         function renderCampaignTab() {
-            const container = document.getElementById('campaign-weeks-container');
-            container.innerHTML = "";
+            const fSemanaVal = document.getElementById('campaign-filter-semana').value;
+            const titleEl = document.getElementById('campaign-week-title');
+            const badgeEl = document.getElementById('campaign-week-badge');
+            const vContainer = document.getElementById('campaign-vendedores-container');
+            const sContainer = document.getElementById('campaign-supervisor-container');
+            const alertEl = document.getElementById('campaign-activation-alert');
+            const totalCombosEl = document.getElementById('campaign-total-combos');
 
-            const fSemana = document.getElementById('campaign-filter-semana').value;
-            const dataAgosto = globalData.filter(d => d.Mês === 'Agosto' && parseFloat(d.VendaBruta) > 0 && (!fSemana || String(d.Semana) === fSemana));
-            
+            const configuracaoSemanas = {
+                '1': { nome: 'Semana 1 (02 a 08/Ago)', minCombosVendedor: 0, minCombosSupervisor: 0, minCombosJBS: 0 },
+                '2': { nome: 'Semana 2 (09 a 15/Ago)', minCombosVendedor: 15, minCombosSupervisor: 0, minCombosJBS: 0 },
+                '3': { nome: 'Semana 3 (16 a 22/Ago)', minCombosVendedor: 20, minCombosSupervisor: 80, minCombosJBS: 320 },
+                '4': { nome: 'Semana 4 (23 a 29/Ago)', minCombosVendedor: 20, minCombosSupervisor: 80, minCombosJBS: 320 },
+                'todas': { nome: 'Todas as Semanas (Acumulado Agosto)', minCombosVendedor: 0, minCombosSupervisor: 0, minCombosJBS: 0 }
+            };
+
+            const cfg = configuracaoSemanas[fSemanaVal] || configuracaoSemanas['1'];
+
+            if (titleEl) {
+                titleEl.innerHTML = `<span><i class="fa-solid fa-calendar-week mr-2"></i>${cfg.nome}</span>`;
+            }
+
+            if (badgeEl) {
+                if (fSemanaVal === '1' || fSemanaVal === 'todas') {
+                    badgeEl.className = "bg-emerald-900/30 text-emerald-300 border border-emerald-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-semibold";
+                    badgeEl.innerHTML = `<i class="fa-solid fa-check mr-1"></i>Semana Válida`;
+                } else if (fSemanaVal === '2') {
+                    badgeEl.className = "bg-amber-900/30 text-amber-300 border border-amber-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-semibold";
+                    badgeEl.innerHTML = `<i class="fa-solid fa-bullseye mr-1"></i>Meta: Min. 15 Combos`;
+                } else if (fSemanaVal === '3' || fSemanaVal === '4') {
+                    badgeEl.className = "bg-amber-900/30 text-amber-300 border border-amber-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-semibold";
+                    badgeEl.innerHTML = `<i class="fa-solid fa-bullseye mr-1"></i>Meta: 20 Vend / 80 Sup / 320 JBS`;
+                }
+            }
+
+            // FILTRAGEM PELA COLUNA SEMANA CAMPANHA
+            const dataAgosto = globalData.filter(d => {
+                const mesStr = String(d.Mês || d.Mes || '').trim().toLowerCase();
+                if (!mesStr.includes('agosto')) return false;
+
+                const vBruta = parseFloat(d.VendaBruta || d.FaturamentoLiquido || 0);
+                if (vBruta <= 0) return false;
+
+                if (fSemanaVal === 'todas') return true;
+
+                const semanaRegistro = parseInt(d.SemanaCampanha || 0, 10);
+                return semanaRegistro === parseInt(fSemanaVal, 10);
+            });
+
+            console.log(`Semana: ${fSemanaVal} | Registros: ${dataAgosto.length}`);
+
             if (dataAgosto.length === 0) {
-                container.innerHTML = `<div class="p-8 text-center bg-darkCard border border-slate-800 rounded-xl"><p class="text-slate-400">Nenhum registro encontrado para o filtro selecionado.</p></div>`;
+                if (alertEl) alertEl.classList.add('hidden');
+                vContainer.innerHTML = `
+                    <div class="p-8 text-center bg-darkBg/60 border border-slate-800/80 rounded-xl">
+                        <i class="fa-solid fa-clock text-3xl text-sumoOrange mb-3 animate-pulse"></i>
+                        <p class="text-slate-300 font-semibold text-sm">Esta semana ainda não possui registros comerciais faturados no sistema.</p>
+                        <p class="text-slate-500 text-xs mt-1">Os dados do ranking serão exibidos assim que as vendas dessa semana forem lançadas no Excel.</p>
+                    </div>`;
+                sContainer.innerHTML = `<div class="p-6 text-center text-slate-500 text-xs bg-darkBg/40 border border-slate-800 rounded-xl">Aguardando faturamento da semana.</div>`;
                 return;
             }
 
-            const semanasSet = new Set(dataAgosto.map(d => d.Semana));
-            const semanas = Array.from(semanasSet).sort((a,b) => a - b);
-            
-            let campaignData = {};
-            semanas.forEach(s => { campaignData[s] = { vendedores: {}, supervisores: {} }; });
+            let vMap = {};
+            let sMap = {};
 
             dataAgosto.forEach(i => {
-                const s = i.Semana;
                 const ven = i.Vendedor;
                 const sup = i.Supervisor;
                 const cliente = i.Cliente;
-                const marca = String(i.Marca).trim().toUpperCase(); 
+                const marca = String(i.Marca || '').trim().toUpperCase();
                 const fat = parseFloat(i.FaturamentoLiquido || 0);
-                
-                if(!cliente || !ven) return;
-                
-                if(!campaignData[s].vendedores[ven]) {
-                    campaignData[s].vendedores[ven] = { cod: i.CodigoVendedor, sup: sup, clientes: {}, totalFatSemana: 0, posGeralSet: new Set() };
-                }
-                campaignData[s].vendedores[ven].totalFatSemana += fat;
-                if(fat > 0) campaignData[s].vendedores[ven].posGeralSet.add(cliente);
 
-                if(!campaignData[s].vendedores[ven].clientes[cliente]) campaignData[s].vendedores[ven].clientes[cliente] = new Set();
-                
-                if (marca === 'AQUACOCO') campaignData[s].vendedores[ven].clientes[cliente].add('AQUACOCO');
-                if (marca === 'SUMO') campaignData[s].vendedores[ven].clientes[cliente].add('SUMO');
+                if(!cliente || !ven) return;
+
+                if(!vMap[ven]) {
+                    vMap[ven] = {
+                        cod: i.CodigoVendedor,
+                        sup: sup,
+                        clientes: {},
+                        totalFatSemana: 0,
+                        posGeralSet: new Set()
+                    };
+                }
+                vMap[ven].totalFatSemana += fat;
+                if(fat > 0) vMap[ven].posGeralSet.add(cliente);
+
+                if(!vMap[ven].clientes[cliente]) vMap[ven].clientes[cliente] = new Set();
+                if (marca === 'AQUACOCO') vMap[ven].clientes[cliente].add('AQUACOCO');
+                if (marca === 'SUMO') vMap[ven].clientes[cliente].add('SUMO');
 
                 if(sup) {
-                    if(!campaignData[s].supervisores[sup]) campaignData[s].supervisores[sup] = { cod: i.CodigoSupervisor, clientes: {} };
-                    if(!campaignData[s].supervisores[sup].clientes[cliente]) campaignData[s].supervisores[sup].clientes[cliente] = new Set();
-                    if (marca === 'AQUACOCO') campaignData[s].supervisores[sup].clientes[cliente].add('AQUACOCO');
-                    if (marca === 'SUMO') campaignData[s].supervisores[sup].clientes[cliente].add('SUMO');
+                    if(!sMap[sup]) sMap[sup] = { cod: i.CodigoSupervisor, clientes: {} };
+                    if(!sMap[sup].clientes[cliente]) sMap[sup].clientes[cliente] = new Set();
+                    if (marca === 'AQUACOCO') sMap[sup].clientes[cliente].add('AQUACOCO');
+                    if (marca === 'SUMO') sMap[sup].clientes[cliente].add('SUMO');
                 }
             });
 
-            semanas.forEach(s => {
-                let rankV = [];
-                for(let ven in campaignData[s].vendedores) {
-                    let ptsCombo = 0;
-                    for(let c in campaignData[s].vendedores[ven].clientes) {
-                        const m = campaignData[s].vendedores[ven].clientes[c];
-                        if(m.has('AQUACOCO') && m.has('SUMO')) ptsCombo++;
-                    }
-                    if(ptsCombo > 0) {
-                        rankV.push({ 
-                            nome: ven, 
-                            cod: campaignData[s].vendedores[ven].cod, 
-                            pts: ptsCombo, 
-                            sup: campaignData[s].vendedores[ven].sup,
-                            posGeral: campaignData[s].vendedores[ven].posGeralSet.size,
-                            fatSemana: campaignData[s].vendedores[ven].totalFatSemana
-                        });
-                    }
+            let rankV = [];
+            for(let ven in vMap) {
+                let ptsCombo = 0;
+                for(let c in vMap[ven].clientes) {
+                    const m = vMap[ven].clientes[c];
+                    if(m.has('AQUACOCO') && m.has('SUMO')) ptsCombo++;
                 }
 
-                rankV.sort((a,b) => {
-                    if (b.pts !== a.pts) return b.pts - a.pts;
-                    if (b.posGeral !== a.posGeral) return b.posGeral - a.posGeral;
-                    return b.fatSemana - a.fatSemana;
-                });
+                const fatSemana = vMap[ven].totalFatSemana;
+                const posGeral = vMap[ven].posGeralSet.size;
 
-                let rankS = [];
-                for(let sup in campaignData[s].supervisores) {
-                    let pts = 0;
-                    for(let c in campaignData[s].supervisores[sup].clientes) {
-                        const m = campaignData[s].supervisores[sup].clientes[c];
-                        if(m.has('AQUACOCO') && m.has('SUMO')) pts++;
-                    }
-                    if(pts > 0) rankS.push({ nome: sup, cod: campaignData[s].supervisores[sup].cod, pts: pts });
+                const atingeCombosVendedor = ptsCombo >= cfg.minCombosVendedor;
+
+                if(ptsCombo > 0) {
+                    rankV.push({
+                        nome: ven,
+                        cod: vMap[ven].cod,
+                        pts: ptsCombo,
+                        sup: vMap[ven].sup,
+                        posGeral: posGeral,
+                        fatSemana: fatSemana,
+                        atingeCombosVendedor: atingeCombosVendedor
+                    });
                 }
-                rankS.sort((a,b) => b.pts - a.pts);
-                const top1S = rankS.length > 0 ? rankS[0] : null;
+            }
 
-                if(rankV.length === 0 && !top1S) return;
+            // ORDENAÇÃO: ELEGÍVEIS PRIMEIRO, DEPOIS COMBOS, POSITIVAÇÃO E FATURAMENTO
+            rankV.sort((a, b) => {
+                if (b.atingeCombosVendedor !== a.atingeCombosVendedor) return b.atingeCombosVendedor - a.atingeCombosVendedor;
+                if (b.pts !== a.pts) return b.pts - a.pts;
+                if (b.posGeral !== a.posGeral) return b.posGeral - a.posGeral;
+                return b.fatSemana - a.fatSemana;
+            });
 
-                let vHTML = rankV.map((v, i) => {
-                    const eGanhador = i < 4;
+            let rankS = [];
+            for(let sup in sMap) {
+                let pts = 0;
+                for(let c in sMap[sup].clientes) {
+                    const m = sMap[sup].clientes[c];
+                    if(m.has('AQUACOCO') && m.has('SUMO')) pts++;
+                }
+                if(pts > 0) rankS.push({ nome: sup, cod: sMap[sup].cod, pts: pts });
+            }
+            rankS.sort((a, b) => b.pts - a.pts);
+            const top1S = rankS.length > 0 ? rankS[0] : null;
+
+            // TOTAL DE COMBOS DA JBS FRIOS
+            const totalCombosJBS = rankS.reduce((sum, s) => sum + s.pts, 0);
+            const campanhaAtivada = totalCombosJBS >= cfg.minCombosJBS;
+            const supervisorElegivel = top1S && top1S.pts >= cfg.minCombosSupervisor;
+
+            if (alertEl) {
+                if (fSemanaVal === '3' || fSemanaVal === '4') {
+                    alertEl.classList.remove('hidden');
+                    totalCombosEl.innerText = totalCombosJBS;
+                } else {
+                    alertEl.classList.add('hidden');
+                }
+            }
+
+            // SÓ PREMIA SE A CAMPANHA ESTIVER ATIVADA
+            const ganhadoresElegiveis = campanhaAtivada 
+                ? rankV.filter(v => v.atingeCombosVendedor).slice(0, 4) 
+                : [];
+
+            if (rankV.length === 0) {
+                vContainer.innerHTML = `<div class="p-6 text-center text-slate-400 text-sm">Nenhum combo faturado registrado nesta semana.</div>`;
+            } else {
+                vContainer.innerHTML = rankV.map((v, i) => {
+                    const eGanhador = ganhadoresElegiveis.includes(v);
+
+                    let statusMetaHTML = '';
+                    if (!v.atingeCombosVendedor && cfg.minCombosVendedor > 0) {
+                        statusMetaHTML += `<span class="text-[9px] bg-red-900/40 text-red-300 px-1.5 py-0.5 rounded border border-red-500/30 font-semibold" title="Mínimo exigido: ${cfg.minCombosVendedor} combos"><i class="fa-solid fa-circle-xmark mr-0.5"></i> < ${cfg.minCombosVendedor} Combos</span> `;
+                    }
+
                     return `
-                    <div onclick="openVendedorModal('${v.nome}')" class="flex items-center gap-3 p-3 bg-darkBg border ${eGanhador ? 'border-sumoOrange/60' : 'border-slate-800'} rounded-xl hover:border-aquaLight cursor-pointer transition relative overflow-hidden group">
-                        <div class="font-black text-lg w-6 text-center ${i===0?'text-amber-400':i===1?'text-slate-300':i===2?'text-amber-700':i===3?'text-aquaLight':'text-slate-500'}">${i+1}º</div>
+                    <div onclick="openVendedorModal('${v.nome}')" class="flex items-center gap-3 p-3 bg-darkBg border ${eGanhador ? 'border-sumoOrange/60 bg-gradient-to-r from-darkBg to-emerald-950/20' : 'border-slate-800'} rounded-xl hover:border-aquaLight cursor-pointer transition relative overflow-hidden group">
+                        <div class="font-black text-lg w-6 text-center ${eGanhador && i===0?'text-amber-400':eGanhador && i===1?'text-slate-300':eGanhador && i===2?'text-amber-700':eGanhador && i===3?'text-aquaLight':'text-slate-600'}">${i+1}º</div>
                         <img src="Imagens_Vendedores/${String(v.cod).trim()}.png" onerror="this.src='https://via.placeholder.com/100/112218/fff?text=V'" class="h-11 w-11 rounded-full object-cover border-2 border-slate-600 bg-slate-800 z-10 shrink-0">
                         <div class="flex-1 z-10 min-w-0">
                             <h4 class="text-xs font-bold text-white truncate">${v.nome}</h4>
                             <p class="text-[10px] text-slate-400 truncate">${v.sup}</p>
-                            <span class="inline-block mt-0.5 text-[10px] text-aquaLight bg-aquaGreen/20 px-1.5 py-0.5 rounded font-semibold">Posit. Geral: ${v.posGeral} Clt</span>
+                            <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                                <span class="text-[10px] text-aquaLight bg-aquaGreen/20 px-1.5 py-0.5 rounded font-semibold">Posit. Geral: ${v.posGeral} Clt</span>
+                                <span class="text-[10px] text-emerald-400 bg-emerald-900/30 px-1.5 py-0.5 rounded font-semibold">${formatCurrency(v.fatSemana)}</span>
+                                ${statusMetaHTML}
+                            </div>
                         </div>
                         <div class="text-right z-10 shrink-0">
                             <div class="text-[10px] text-slate-400 uppercase">Combos</div>
-                            <div class="text-sm font-black text-white">${v.pts}</div>
+                            <div class="text-sm font-black ${v.atingeCombosVendedor ? 'text-white' : 'text-red-400'}">${v.pts}</div>
                         </div>
                         ${eGanhador ? `
-                        <div class="bg-emerald-900/40 border border-emerald-500/30 px-2 py-1 rounded text-center ml-1 z-10 shrink-0">
+                        <div class="bg-emerald-900/40 border border-emerald-500/30 px-2 py-1 rounded text-center ml-1 z-10 shrink-0 shadow-sm">
                             <i class="fa-solid fa-money-bill-wave text-emerald-400 text-xs block"></i>
                             <span class="text-emerald-300 font-bold text-[10px] whitespace-nowrap">+ R$ 200</span>
                         </div>` : ''}
                     </div>`;
                 }).join('');
+            }
 
-                let sHTML = top1S ? `
-                    <div class="h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-darkBg to-slate-900 border border-aquaLight/30 rounded-2xl relative overflow-hidden shadow-lg">
-                        <i class="fa-solid fa-crown text-3xl text-sumoOrange mb-3 animate-bounce"></i>
-                        <img src="Imagens_Supervisores/${String(top1S.cod).trim()}.png" onerror="this.src='https://via.placeholder.com/150/112218/fff?text=S'" class="h-20 w-20 rounded-full object-cover border-4 border-aquaLight bg-slate-800 shadow-xl z-10 mb-2">
+            if (top1S) {
+                const supervisorGanha = campanhaAtivada && supervisorElegivel;
+
+                sContainer.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-darkBg to-slate-900 border ${supervisorGanha ? 'border-aquaLight/30' : 'border-red-500/30'} rounded-2xl relative overflow-hidden shadow-lg">
+                        <i class="fa-solid fa-crown text-3xl ${supervisorGanha ? 'text-sumoOrange animate-bounce' : 'text-red-400'} mb-3"></i>
+                        <img src="Imagens_Supervisores/${String(top1S.cod).trim()}.png" onerror="this.src='https://via.placeholder.com/150/112218/fff?text=S'" class="h-20 w-20 rounded-full object-cover border-4 ${supervisorGanha ? 'border-aquaLight' : 'border-red-400'} bg-slate-800 shadow-xl z-10 mb-2">
                         <h4 class="text-base font-bold text-white text-center z-10">${top1S.nome}</h4>
                         <p class="text-xs text-slate-300 text-center z-10 mb-3">Total Equipe: <b class="text-sumoOrange">${top1S.pts} Combos</b></p>
+                        ${supervisorGanha ? `
                         <div class="inline-block bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 px-3 py-1 rounded-full font-black text-xs z-10">
                             <i class="fa-solid fa-trophy mr-1"></i> R$ 200,00 Garantidos!
                         </div>
-                    </div>
-                ` : `<div class="p-4 text-center text-slate-500">Aguardando dados da supervisão.</div>`;
-
-                container.innerHTML += `
-                    <div class="bg-darkCard border border-slate-800 rounded-2xl p-5 shadow-lg relative">
-                        <h3 class="text-base font-black text-aquaLight mb-4 pb-2 border-b border-slate-700/50 flex items-center justify-between">
-                            <span><i class="fa-solid fa-calendar-week mr-2"></i>Semana Ref. ISO ${s}</span>
-                            <span class="bg-white/10 text-white/60 text-xs px-2 py-0.5 rounded-full font-normal"><i class="fa-solid fa-check-double mr-1"></i>Válida</span>
-                        </h3>
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div class="lg:col-span-2 space-y-2">
-                                <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">🏅 Ranking de Representantes (Barra de Rolagem Ativa)</h4>
-                                <div class="max-h-[350px] overflow-y-auto pr-2 space-y-2.5 custom-scroll">
-                                    ${vHTML || '<p class="text-slate-500 text-sm">Nenhum combo registrado nesta semana.</p>'}
-                                </div>
-                            </div>
-                            <div class="lg:col-span-1">
-                                <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">⭐ Melhor Supervisor</h4>
-                                ${sHTML}
-                            </div>
+                        ` : `
+                        <div class="inline-block bg-red-900/30 border border-red-500/40 text-red-300 px-3 py-1 rounded-full font-bold text-xs z-10">
+                            <i class="fa-solid fa-lock mr-1"></i> ${campanhaAtivada ? 'Meta mínima: 80 Combos' : 'Campanha não ativada'}
                         </div>
+                        `}
                     </div>
                 `;
-            });
+            } else {
+                sContainer.innerHTML = `<div class="p-4 text-center text-slate-500">Aguardando dados da supervisão.</div>`;
+            }
         }
     </script>
 </body>
