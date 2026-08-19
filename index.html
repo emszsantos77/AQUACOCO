@@ -314,7 +314,7 @@
         </div>
     </div>
 
-    <!-- MODAL DETALHAMENTO DO VENDEDOR -->
+    <!-- MODAL DETALHAMENTO DO VENDEDOR (GERAL) -->
     <div id="vendedor-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center hidden z-50 p-2 sm:p-4">
         <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-[1000px] w-full relative mx-auto flex flex-col max-h-[90vh] overflow-y-auto">
             <button onclick="closeModal('vendedor-modal')" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 h-10 w-10 flex items-center justify-center rounded-full transition z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -359,6 +359,56 @@
                         </tr>
                     </thead>
                     <tbody id="modal-vendedor-tabela" class="divide-y divide-slate-800"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CLIENTES COM COMBO DA CAMPANHA -->
+    <div id="vendedor-campanha-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center hidden z-50 p-2 sm:p-4">
+        <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-[1000px] w-full relative mx-auto flex flex-col max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('vendedor-campanha-modal')" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 h-10 w-10 flex items-center justify-center rounded-full transition z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <div class="flex items-center gap-5 border-b border-slate-800 pb-5 mb-5">
+                <img id="modal-campanha-foto" src="" class="h-20 w-20 rounded-full object-cover border-2 border-aquaLight bg-slate-800 shadow-xl">
+                <div>
+                    <h3 id="modal-campanha-nome" class="text-2xl font-black text-white">---</h3>
+                    <p id="modal-campanha-sup" class="text-sm text-slate-400">Supervisor: ---</p>
+                    <p id="modal-campanha-semana" class="text-xs text-sumoOrange mt-1">---</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <div class="bg-darkBg p-3 rounded-xl border border-slate-800 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">Total de Combos</p>
+                    <p id="modal-campanha-total-combos" class="text-lg font-bold text-sumoOrange mt-1">0</p>
+                </div>
+                <div class="bg-darkBg p-3 rounded-xl border border-slate-800 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">Clientes com Combo</p>
+                    <p id="modal-campanha-total-clientes" class="text-lg font-bold text-white mt-1">0</p>
+                </div>
+                <div class="bg-darkBg p-3 rounded-xl border border-slate-800 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">Faturamento da Semana</p>
+                    <p id="modal-campanha-total-fat" class="text-lg font-bold text-emerald-400 mt-1">R$ 0,00</p>
+                </div>
+            </div>
+
+            <h4 class="text-xs font-bold text-sumoOrange uppercase mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-users"></i> Clientes com Combo (AquaCoco + Sumo)
+            </h4>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead>
+                        <tr class="border-b border-slate-700 text-slate-400 bg-darkBg">
+                            <th class="py-2 px-3">CNPJ / CPF</th>
+                            <th class="py-2 px-3">RAZÃO SOCIAL</th>
+                            <th class="py-2 px-3 text-right">AQUACOCO</th>
+                            <th class="py-2 px-3 text-right">SUMO</th>
+                            <th class="py-2 px-3 text-right">VALOR TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-campanha-tabela" class="divide-y divide-slate-800"></tbody>
+                </thead>
                 </table>
             </div>
         </div>
@@ -437,6 +487,12 @@
         function calcGrowth(atual, anterior) {
             if (!anterior || anterior === 0) return 0;
             return ((atual - anterior) / anterior) * 100;
+        }
+
+        function normalizarCodigoImagem(codigo) {
+            return String(codigo ?? '')
+                .trim()
+                .replace(/\.0+$/, '');
         }
 
         function populateFilters() {
@@ -781,7 +837,7 @@
             });
 
             document.getElementById('supervisors-grid').innerHTML = Object.entries(sData).sort((a,b)=>b[1].fat - a[1].fat).map(([n,d]) => {
-                const c = String(d.cod).trim();
+                const c = normalizarCodigoImagem(d.cod);
                 const isSelected = selectedSupervisor === n;
                 return `
                 <div onclick="selectSupervisor('${n}')" class="bg-darkBg border ${isSelected ? 'border-aquaLight ring-2 ring-aquaLight/50' : 'border-slate-800'} p-4 rounded-xl flex items-center gap-4 hover:border-aquaLight cursor-pointer transition">
@@ -814,7 +870,7 @@
             const grid = document.getElementById('team-vendedores-grid');
             
             grid.innerHTML = Object.entries(vMap).sort((a,b)=>b[1].fat - a[1].fat).map(([vNome, d]) => {
-                const c = String(d.cod).trim();
+                const c = normalizarCodigoImagem(d.cod);
                 return `
                 <div onclick="openVendedorModal('${vNome}')" class="bg-darkBg p-3 rounded-lg border border-slate-800 hover:border-aquaLight cursor-pointer transition flex items-center gap-3">
                     <img src="Imagens_Vendedores/${c}.png" onerror="this.src='https://via.placeholder.com/100/112218/fff?text=V'" class="h-10 w-10 rounded-full object-cover border border-slate-700 shrink-0">
@@ -840,11 +896,11 @@
             if(vData.length === 0) return;
 
             const sup = vData[0].Supervisor || "Sem Supervisor";
-            const cod = vData[0].CodigoVendedor || "";
+            const cod = normalizarCodigoImagem(vData[0].CodigoVendedor || "");
 
             document.getElementById('modal-vendedor-nome').innerText = vendedorNome;
             document.getElementById('modal-vendedor-sup').innerText = `Supervisor: ${sup}`;
-            document.getElementById('modal-vendedor-foto').src = `Imagens_Vendedores/${String(cod).trim()}.png`;
+            document.getElementById('modal-vendedor-foto').src = `Imagens_Vendedores/${cod}.png`;
             document.getElementById('modal-vendedor-foto').onerror = function() { this.src = 'https://via.placeholder.com/100/112218/fff?text=V'; };
 
             let porMes = {};
@@ -904,6 +960,99 @@
             document.getElementById('vendedor-modal').classList.remove('hidden');
         }
 
+        // MODAL DE CLIENTES COM COMBO DA CAMPANHA
+        function openVendedorCampanhaModal(vendedorNome, semanaVal) {
+            const dataFiltrada = globalData.filter(d => {
+                const mesStr = String(d.Mês || '').trim().toLowerCase();
+                if (!mesStr.includes('agosto')) return false;
+                if (d.Vendedor !== vendedorNome) return false;
+                if (semanaVal === 'todas') return true;
+                return parseInt(d.SemanaCampanha || 0, 10) === parseInt(semanaVal, 10);
+            });
+
+            if (dataFiltrada.length === 0) return;
+
+            const sup = dataFiltrada[0].Supervisor || "Sem Supervisor";
+            const cod = normalizarCodigoImagem(dataFiltrada[0].CodigoVendedor || "");
+
+            // Agrupar por cliente e detectar combo
+            let clientesMap = {};
+            dataFiltrada.forEach(i => {
+                const cliente = i.Cliente;
+                const razao = i.Razão || i.Razao || 'Sem Razão';
+                const marca = String(i.Marca || '').trim().toUpperCase();
+                const fat = parseFloat(i.FaturamentoLiquido || 0);
+
+                if (!cliente) return;
+
+                if (!clientesMap[cliente]) {
+                    clientesMap[cliente] = {
+                        razao: razao,
+                        aquacoco: 0,
+                        sumo: 0,
+                        total: 0
+                    };
+                }
+
+                if (marca === 'AQUACOCO') clientesMap[cliente].aquacoco += fat;
+                if (marca === 'SUMO') clientesMap[cliente].sumo += fat;
+                clientesMap[cliente].total += fat;
+            });
+
+            // Apenas clientes com combo (AQUACOCO + SUMO)
+            let clientesCombo = [];
+            let totalCombos = 0;
+            let totalFatSemana = 0;
+
+            for (let cnpj in clientesMap) {
+                const c = clientesMap[cnpj];
+                if (c.aquacoco > 0 && c.sumo > 0) {
+                    clientesCombo.push({
+                        cnpj: cnpj,
+                        razao: c.razao,
+                        aquacoco: c.aquacoco,
+                        sumo: c.sumo,
+                        total: c.total
+                    });
+                    totalCombos++;
+                }
+                totalFatSemana += c.total;
+            }
+
+            // Ordenar por valor total
+            clientesCombo.sort((a, b) => b.total - a.total);
+
+            document.getElementById('modal-campanha-nome').innerText = vendedorNome;
+            document.getElementById('modal-campanha-sup').innerText = `Supervisor: ${sup}`;
+            document.getElementById('modal-campanha-semana').innerText = semanaVal === 'todas' ? 'Todas as Semanas (Acumulado)' : `Semana ${semanaVal}`;
+            document.getElementById('modal-campanha-foto').src = `Imagens_Vendedores/${cod}.png`;
+            document.getElementById('modal-campanha-foto').onerror = function() { this.src = 'https://via.placeholder.com/100/112218/fff?text=V'; };
+
+            document.getElementById('modal-campanha-total-combos').innerText = totalCombos;
+            document.getElementById('modal-campanha-total-clientes').innerText = clientesCombo.length;
+            document.getElementById('modal-campanha-total-fat').innerText = formatCurrency(totalFatSemana);
+
+            const htmlTabela = clientesCombo.map(c => `
+                <tr>
+                    <td class="py-2.5 px-3 text-slate-300 font-mono text-[10px]">${c.cnpj}</td>
+                    <td class="py-2.5 px-3 text-white font-semibold">${c.razao}</td>
+                    <td class="py-2.5 px-3 text-right text-aquaLight font-semibold">${formatCurrency(c.aquacoco)}</td>
+                    <td class="py-2.5 px-3 text-right text-sumoOrange font-semibold">${formatCurrency(c.sumo)}</td>
+                    <td class="py-2.5 px-3 text-right text-emerald-400 font-bold">${formatCurrency(c.total)}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('modal-campanha-tabela').innerHTML = htmlTabela || `
+                <tr>
+                    <td colspan="5" class="py-6 text-center text-slate-400 text-sm">
+                        Nenhum cliente com combo encontrado para este vendedor nesta semana.
+                    </td>
+                </tr>
+            `;
+
+            document.getElementById('vendedor-campanha-modal').classList.remove('hidden');
+        }
+
         // RENDERIZADOR DO RANKING DA CAMPANHA (COM REGRAS COMBO-ONLY)
         function renderCampaignTab() {
             const fSemanaVal = document.getElementById('campaign-filter-semana').value;
@@ -941,7 +1090,6 @@
                 }
             }
 
-            // FILTRAGEM PELA COLUNA SEMANA CAMPANHA
             const dataAgosto = globalData.filter(d => {
                 const mesStr = String(d.Mês || d.Mes || '').trim().toLowerCase();
                 if (!mesStr.includes('agosto')) return false;
@@ -983,7 +1131,7 @@
 
                 if(!vMap[ven]) {
                     vMap[ven] = {
-                        cod: i.CodigoVendedor,
+                        cod: normalizarCodigoImagem(i.CodigoVendedor),
                         sup: sup,
                         clientes: {},
                         totalFatSemana: 0,
@@ -998,7 +1146,7 @@
                 if (marca === 'SUMO') vMap[ven].clientes[cliente].add('SUMO');
 
                 if(sup) {
-                    if(!sMap[sup]) sMap[sup] = { cod: i.CodigoSupervisor, clientes: {} };
+                    if(!sMap[sup]) sMap[sup] = { cod: normalizarCodigoImagem(i.CodigoSupervisor), clientes: {} };
                     if(!sMap[sup].clientes[cliente]) sMap[sup].clientes[cliente] = new Set();
                     if (marca === 'AQUACOCO') sMap[sup].clientes[cliente].add('AQUACOCO');
                     if (marca === 'SUMO') sMap[sup].clientes[cliente].add('SUMO');
@@ -1031,7 +1179,6 @@
                 }
             }
 
-            // ORDENAÇÃO: ELEGÍVEIS PRIMEIRO, DEPOIS COMBOS, POSITIVAÇÃO E FATURAMENTO
             rankV.sort((a, b) => {
                 if (b.atingeCombosVendedor !== a.atingeCombosVendedor) return b.atingeCombosVendedor - a.atingeCombosVendedor;
                 if (b.pts !== a.pts) return b.pts - a.pts;
@@ -1051,7 +1198,6 @@
             rankS.sort((a, b) => b.pts - a.pts);
             const top1S = rankS.length > 0 ? rankS[0] : null;
 
-            // TOTAL DE COMBOS DA JBS FRIOS
             const totalCombosJBS = rankS.reduce((sum, s) => sum + s.pts, 0);
             const campanhaAtivada = totalCombosJBS >= cfg.minCombosJBS;
             const supervisorElegivel = top1S && top1S.pts >= cfg.minCombosSupervisor;
@@ -1065,7 +1211,6 @@
                 }
             }
 
-            // SÓ PREMIA SE A CAMPANHA ESTIVER ATIVADA
             const ganhadoresElegiveis = campanhaAtivada 
                 ? rankV.filter(v => v.atingeCombosVendedor).slice(0, 4) 
                 : [];
@@ -1082,9 +1227,9 @@
                     }
 
                     return `
-                    <div onclick="openVendedorModal('${v.nome}')" class="flex items-center gap-3 p-3 bg-darkBg border ${eGanhador ? 'border-sumoOrange/60 bg-gradient-to-r from-darkBg to-emerald-950/20' : 'border-slate-800'} rounded-xl hover:border-aquaLight cursor-pointer transition relative overflow-hidden group">
+                    <div onclick="openVendedorCampanhaModal('${v.nome}', '${fSemanaVal}')" class="flex items-center gap-3 p-3 bg-darkBg border ${eGanhador ? 'border-sumoOrange/60 bg-gradient-to-r from-darkBg to-emerald-950/20' : 'border-slate-800'} rounded-xl hover:border-aquaLight cursor-pointer transition relative overflow-hidden group">
                         <div class="font-black text-lg w-6 text-center ${eGanhador && i===0?'text-amber-400':eGanhador && i===1?'text-slate-300':eGanhador && i===2?'text-amber-700':eGanhador && i===3?'text-aquaLight':'text-slate-600'}">${i+1}º</div>
-                        <img src="Imagens_Vendedores/${String(v.cod).trim()}.png" onerror="this.src='https://via.placeholder.com/100/112218/fff?text=V'" class="h-11 w-11 rounded-full object-cover border-2 border-slate-600 bg-slate-800 z-10 shrink-0">
+                        <img src="Imagens_Vendedores/${v.cod}.png" onerror="this.src='https://via.placeholder.com/100/112218/fff?text=V'" class="h-11 w-11 rounded-full object-cover border-2 border-slate-600 bg-slate-800 z-10 shrink-0">
                         <div class="flex-1 z-10 min-w-0">
                             <h4 class="text-xs font-bold text-white truncate">${v.nome}</h4>
                             <p class="text-[10px] text-slate-400 truncate">${v.sup}</p>
@@ -1113,7 +1258,7 @@
                 sContainer.innerHTML = `
                     <div class="h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-darkBg to-slate-900 border ${supervisorGanha ? 'border-aquaLight/30' : 'border-red-500/30'} rounded-2xl relative overflow-hidden shadow-lg">
                         <i class="fa-solid fa-crown text-3xl ${supervisorGanha ? 'text-sumoOrange animate-bounce' : 'text-red-400'} mb-3"></i>
-                        <img src="Imagens_Supervisores/${String(top1S.cod).trim()}.png" onerror="this.src='https://via.placeholder.com/150/112218/fff?text=S'" class="h-20 w-20 rounded-full object-cover border-4 ${supervisorGanha ? 'border-aquaLight' : 'border-red-400'} bg-slate-800 shadow-xl z-10 mb-2">
+                        <img src="Imagens_Supervisores/${top1S.cod}.png" onerror="this.src='https://via.placeholder.com/150/112218/fff?text=S'" class="h-20 w-20 rounded-full object-cover border-4 ${supervisorGanha ? 'border-aquaLight' : 'border-red-400'} bg-slate-800 shadow-xl z-10 mb-2">
                         <h4 class="text-base font-bold text-white text-center z-10">${top1S.nome}</h4>
                         <p class="text-xs text-slate-300 text-center z-10 mb-3">Total Equipe: <b class="text-sumoOrange">${top1S.pts} Combos</b></p>
                         ${supervisorGanha ? `
